@@ -1,0 +1,9 @@
+[project]
+name = "maldives-gazette-mcp"
+version = "0.1.0"
+description = "Read-only MCP server for the Maldives Government Gazette"
+requires-python = ">=3.11"
+dependencies = ["mcp", "beautifulsoup4"]
+
+[project.scripts]
+maldives-gazette-mcp = "server:main"
