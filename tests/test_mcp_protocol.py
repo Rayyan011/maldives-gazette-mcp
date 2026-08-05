@@ -31,6 +31,7 @@ async def main() -> None:
                 "iulaan_categories",
                 "search_iulaan",
                 "get_iulaan",
+                "read_iulaan_attachment",
             }
             assert set(names) == expected, names
 
@@ -74,7 +75,15 @@ async def main() -> None:
             assert iulaan_detail["title"], iulaan_detail
             assert iulaan_detail["attachments"], iulaan_detail
 
-            print(json.dumps({"tools": names, "status": status, "first_result": search["results"][0], "detail": detail, "tender": tender["results"][0], "job": jobs["results"][0], "iulaan_detail": iulaan_detail}, ensure_ascii=False, indent=2))
+            attachment_result = await session.call_tool(
+                "read_iulaan_attachment",
+                {"url": iulaan_detail["attachments"][0]["url"], "max_chars": 2000},
+            )
+            attachment = json.loads(attachment_result.content[0].text)
+            assert attachment["characters"] > 0, attachment
+            assert attachment["source"].endswith(".pdf"), attachment
+
+            print(json.dumps({"tools": names, "status": status, "first_result": search["results"][0], "detail": detail, "tender": tender["results"][0], "job": jobs["results"][0], "iulaan_detail": iulaan_detail, "attachment": {"source": attachment["source"], "characters": attachment["characters"], "truncated": attachment["truncated"]}}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

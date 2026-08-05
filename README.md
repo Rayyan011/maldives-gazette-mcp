@@ -18,6 +18,7 @@ It is agent-agnostic: every MCP-compatible client launches the same Python stdio
 | `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
 | `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status. |
 | `get_iulaan` | Read one announcement's issuer, deadline, announcement number, and attachments. |
+| `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
 
 The server allowlists Gazette record pages and the official Google Storage PDF path. It never logs in, posts, edits, contacts anyone, or changes the source site.
 
@@ -44,7 +45,7 @@ Use absolute paths in client configuration. Do not commit a machine-specific hom
 
 ## Verify
 
-Run the real protocol test; it initializes an MCP client, discovers all eight tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, and reads detail pages:
+Run the real protocol test; it initializes an MCP client, discovers all nine tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, reads detail pages, and extracts text from an official attachment:
 
 ```bash
 .venv/bin/python tests/test_mcp_protocol.py

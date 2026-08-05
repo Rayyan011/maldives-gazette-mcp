@@ -20,7 +20,7 @@ Use the `maldives-gazette` MCP to find public Maldives Government job announceme
 1. Capture the candidate's role, seniority, skills, qualification, atoll/island preference, nationality or work-authorization constraints, salary needs, and application deadline.
 2. Use `search_iulaan` with `announcement_type="vazeefaa"` for job opportunities. Use `job_category` for fields such as construction, finance, information technology, transport, technical, management, or maintenance.
 3. Add a keyword, `office`, date range, and `open_only=true` for current openings. Preserve the returned search URL and live-check timestamp.
-4. Use `get_iulaan` on promising records. Confirm the title, employer/issuer, publication date, deadline, announcement number, and all official attachments.
+4. Use `get_iulaan` on promising records. Confirm the title, employer/issuer, publication date, deadline, announcement number, print view, and all official attachments. Use `read_iulaan_attachment` to extract searchable text from official PDF/DOCX notices when available.
 5. Prefer the official job notice and attached application document over an aggregator or social post. Treat a listing as expired when the stated deadline has passed, even if the page remains searchable.
 
 ## Evidence fields

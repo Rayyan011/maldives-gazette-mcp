@@ -2,10 +2,15 @@
 """Read-only MCP server for the Maldives Government Gazette."""
 from __future__ import annotations
 
+import io
 import json
 import re
+import subprocess
 import sys
+import tempfile
+import zipfile
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 from urllib.request import Request, urlopen
@@ -71,6 +76,17 @@ def _safe_url(url: str, *, allow_pdf: bool = False) -> str:
     if allow_pdf and host == "storage.googleapis.com" and path.startswith("/gazette.gov.mv/docs/gazette/") and path.endswith(".pdf"):
         return url
     raise ValueError("URL is outside the public Gazette allowlist")
+
+
+def _safe_attachment_url(url: str) -> str:
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or parsed.hostname != "storage.googleapis.com":
+        raise ValueError("attachment must use the official storage host")
+    if not parsed.path.startswith("/gazette.gov.mv/docs/iulaan/"):
+        raise ValueError("attachment is outside the official Iulaan attachment path")
+    if not parsed.path.lower().endswith((".pdf", ".docx", ".doc", ".xlsx", ".xls")):
+        raise ValueError("unsupported attachment type")
+    return url
 
 
 def _text(node: Any) -> str:
@@ -328,10 +344,44 @@ def get_iulaan(url_or_id: str) -> str:
         number = next((x.split(":", 1)[1].strip() for x in info if x.startswith("ނަންބަރު:")), None)
         published = next((x.split(":", 1)[1].strip() for x in info if x.startswith("ޕަބްލިޝްކުރި ތާރީޚު:")), None)
         deadline_match = re.search(r"ސުންގަޑި:\s*(.+?)(?:$|Tweet|Share)", full_text)
-        values = {"url": url, "status": status, "title": title or None, "announcement_number": number, "type": _text(type_link) or None, "issuer": _text(issuer_link) or None, "published_date": published, "deadline": deadline_match.group(1).strip() if deadline_match else None, "attachments": attachments, "source": url, "fetched_at": datetime.now(timezone.utc).isoformat()}
+        values = {"url": url, "print_url": f"{IULAAN}/print/{urlparse(url).path.rsplit('/', 1)[-1]}", "status": status, "title": title or None, "announcement_number": number, "type": _text(type_link) or None, "issuer": _text(issuer_link) or None, "published_date": published, "deadline": deadline_match.group(1).strip() if deadline_match else None, "attachments": attachments, "source": url, "fetched_at": datetime.now(timezone.utc).isoformat()}
         return json.dumps(values, ensure_ascii=False)
     except Exception as exc:
         return json.dumps({"error": type(exc).__name__, "message": str(exc), "requested": url_or_id}, ensure_ascii=False)
+
+
+def _extract_docx_text(data: bytes) -> str:
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        xml = archive.read("word/document.xml").decode("utf-8", "replace")
+    xml = re.sub(r"</w:p>", "\n", xml)
+    xml = re.sub(r"<[^>]+>", "", xml)
+    return re.sub(r"\s+", " ", xml).strip()
+
+
+@mcp.tool()
+def read_iulaan_attachment(url: str, max_chars: int = 120000) -> str:
+    """Extract text from an official Iulaan PDF or DOCX attachment for review."""
+    try:
+        url = _safe_attachment_url(url)
+        max_chars = max(1000, min(max_chars, 250000))
+        _, content_type, data = _fetch(url, max_bytes=MAX_PDF)
+        suffix = Path(urlparse(url).path).suffix.lower()
+        if suffix == ".pdf":
+            with tempfile.TemporaryDirectory() as directory:
+                source = Path(directory) / "source.pdf"
+                output = Path(directory) / "output.txt"
+                source.write_bytes(data)
+                completed = subprocess.run(["pdftotext", "-layout", str(source), str(output)], capture_output=True, text=True, timeout=30)
+                if completed.returncode != 0:
+                    raise ValueError(completed.stderr.strip() or "pdftotext failed")
+                text = output.read_text(errors="replace")
+        elif suffix == ".docx":
+            text = _extract_docx_text(data)
+        else:
+            return json.dumps({"error": "unsupported_text_extraction_type", "url": url, "content_type": content_type, "supported": [".pdf", ".docx"]}, ensure_ascii=False)
+        return json.dumps({"url": url, "content_type": content_type, "characters": len(text), "truncated": len(text) > max_chars, "text": text[:max_chars], "source": url, "fetched_at": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False)
+    except Exception as exc:
+        return json.dumps({"error": type(exc).__name__, "message": str(exc), "requested": url}, ensure_ascii=False)
 
 
 def main() -> None:
