@@ -33,7 +33,8 @@ const TRANSLATIONS: Record<string, string> = {
   software: "ސޮފްޓްވެއަރ", technology: "ޓެކްނޮލޮޖީ", technical: "ޓެކްނިކަލް",
   engineer: "އިންޖިނިއަރ", system: "ސިސްޓަމް", systems: "ސިސްޓަމް",
   network: "ނެޓްވޯކް", database: "ޑޭޓާބޭސް", data: "ޑޭޓާ", analyst: "އެނަލިސްޓް",
-  officer: "އޮފިސަރ", manager: "މެނޭޖަރ",
+  officer: "އޮފިސަރ", "human resources officer": "ހިއުމަން ރިސޯސަސް އޮފިސަރ", "hr officer": "ހިއުމަން ރިސޯސަސް އޮފިސަރ", "human resources": "ހިއުމަން ރިސޯސަސް",
+ manager: "މެނޭޖަރ",
 };
 
 const text = (value: cheerio.Cheerio<any> | undefined) => value?.text().replace(/\s+/g, " ").trim() ?? "";

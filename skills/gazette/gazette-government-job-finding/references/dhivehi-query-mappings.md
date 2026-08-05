@@ -18,6 +18,7 @@ Use these as searchable Gazette/Iulaan terms. Keep the original English query as
 | manager | މެނޭޖަރ |
 | procurement | ޕްރޮކިއުމަންޓް |
 | finance | ފައިނޭންސް |
+| human resources officer / HR officer | ހިއުމަން ރިސޯސަސް އޮފިސަރ |
 | human resources | ހިއުމަން ރިސޯސަސް |
 | job opportunity | ވަޒީފާގެ ފުރުޞަތު |
 | tender | ބީލަން |
