@@ -32,6 +32,9 @@ For each role, report:
 - Announcement number
 - Publication date and application deadline as posted
 - Salary or salary range, including pay basis/currency when stated
+- Fixed monthly components separately: basic salary, service/position/job allowance, and other fixed allowances
+- Variable components separately: daily attendance/duty allowances, percentage allowances, overtime, or performance-linked pay
+- Monthly compensation estimate with the calculation basis, working-day count, public holidays removed, and confidence
 - Job description and main responsibilities
 - Required years of experience, preserving the original wording
 - Role category and location when stated
@@ -42,7 +45,18 @@ For each role, report:
 
 Never infer salary, permanent status, nationality eligibility, age limits, housing, visa sponsorship, or selection outcome. Do not silently translate Dhivehi requirements; preserve the original and label any translation.
 
-## Ranking and candidate support
+## Compensation calculation
+
+When the user asks for a monthly total, calculate fixed and variable pay separately before combining them:
+
+```text
+estimated monthly total = fixed monthly pay + (per-day allowance × eligible working days)
+```
+
+Use the specific comparison month when provided. Otherwise state the assumed month and use its calendar. Count Sunday–Thursday as working days and Friday–Saturday as the weekend. Subtract verified national/public holidays and any explicitly stated employer holidays that fall on working days. Do not subtract a holiday twice when it already falls on Friday or Saturday. Treat daily allowances as conditional on actual attendance; do not assume they are paid for leave, holidays, absence, or remote days unless the source says so. Percentage allowances must be calculated from their stated base. Keep unknown components unknown rather than treating them as zero.
+
+Report both the fixed amount and the estimate, for example: `MVR 14,440 fixed + MVR 125 × 22 eligible days = MVR 17,190 estimated for August 2026`. Include the working-day count, holiday dates used, assumptions, and confidence. The estimate is not a guaranteed salary.
+
 
 Rank by must-have qualification fit, role/seniority fit, location, deadline feasibility, source completeness, and candidate preferences. Explain disqualifiers separately from soft preferences. You may draft truthful, role-specific resume bullets or application checklists, but never invent degrees, experience, certifications, referrals, dates, or government connections.
 
