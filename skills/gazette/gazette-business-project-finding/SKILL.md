@@ -30,13 +30,26 @@ For each opportunity, return:
 - Title and original Dhivehi wording
 - Type and issuing office
 - Announcement number
-- Published date and deadline, with timezone/format preserved
-- Official Iulaan record URL
+- Published date and **submission deadline**, with timezone/format preserved
+- Official Iulaan record URL and print URL
 - Every available official attachment URL
+- **Requested requirements and scope:** goods/services, quantities, specifications, eligibility, licenses, location, delivery period, bid security, documents, and submission method
+- **Estimated contract revenue:** `estimated_revenue_mvr`, `revenue_basis`, `assumptions`, and `confidence`
 - Fit notes against the business capability
 - Missing information and next verification step
 
-Rank by capability fit, geography/logistics, deadline feasibility, document completeness, eligibility, and likely commercial attractiveness. Do not invent contract value, budget, winner, eligibility, or deadline extensions.
+## Revenue estimation
+
+Treat revenue as the possible gross contract value, not profit, cash received, or owner income.
+
+1. Prefer an official tender budget, estimated contract value, schedule-of-rates total, or clearly stated price ceiling from the notice or attachment.
+2. If the document gives quantities and unit rates, calculate `quantity × unit_rate` and show the line items.
+3. If the document gives quantities but no rates, produce a labeled scenario only when the user supplies comparable rates or approves assumptions: `quantity × assumed_unit_rate`.
+4. For recurring services, show the period and formula: `monthly_value × contract_months`.
+5. Subtract nothing from revenue. Show bid costs, materials, payroll, tax, bond, transport, overhead, and expected profit separately only when evidenced or explicitly modeled.
+6. If no defensible value is available, return `estimated_revenue_mvr: null` with `revenue_basis: "not stated"`; never infer value from the title, deadline, issuer, or unrelated tenders.
+
+Use a confidence label: `high` for an official stated value, `medium` for an arithmetic total from official quantities/rates, and `low` for user-approved market assumptions. Do not present low-confidence scenarios as facts.
 
 ## Safety boundaries
 
