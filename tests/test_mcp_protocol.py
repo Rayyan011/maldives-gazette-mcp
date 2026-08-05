@@ -75,6 +75,8 @@ async def main() -> None:
             assert iulaan_detail["status"] == 200, iulaan_detail
             assert iulaan_detail["title"], iulaan_detail
             assert iulaan_detail["attachments"], iulaan_detail
+            assert iulaan_detail["employer"], iulaan_detail
+            assert iulaan_detail["job_details"] is None, iulaan_detail
 
             attachment_result = await session.call_tool(
                 "read_iulaan_attachment",

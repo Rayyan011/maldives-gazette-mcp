@@ -18,7 +18,7 @@ It is agent-agnostic: every MCP-compatible client launches the same Python stdio
 | `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
 | `translate_iulaan_query` | Show Dhivehi variants generated from an English Iulaan search phrase. |
 | `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status; English keywords are expanded into Dhivehi variants. |
-| `get_iulaan` | Read one announcement's issuer, deadline, announcement number, and attachments. |
+| `get_iulaan` | Read one announcement's employer/issuer, deadline, announcement number, job fields, and attachments. |
 | `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
 
 The server allowlists Gazette record pages and the official Google Storage PDF path. It never logs in, posts, edits, contacts anyone, or changes the source site.
