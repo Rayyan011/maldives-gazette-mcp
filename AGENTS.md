@@ -6,8 +6,8 @@
 
 - Website: https://www.gazette.gov.mv/gazette
 - Transport: MCP stdio
-- Entrypoint: `server.py`
-- Runtime: Python 3.11+
+- Entrypoint: `dist/server.js`
+- Runtime: Node.js 20+
 
 The server is intentionally agent-agnostic. Claude Code, Codex CLI, Cursor, Claude Desktop, Gemini CLI, Windsurf, Cline, Roo Code, VS Code MCP clients, Goose, Continue, Hermes, and other MCP-compatible clients can launch the same stdio command.
 
@@ -21,10 +21,8 @@ The server is intentionally agent-agnostic. Claude Code, Codex CLI, Cursor, Clau
 ## Setup
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m compileall -q server.py
+npm install
+npm run build
 ```
 
 The MCP server is a stdio process, so it should not be started as a long-running HTTP service for normal client use.
@@ -32,7 +30,7 @@ The MCP server is a stdio process, so it should not be started as a long-running
 ## Run manually
 
 ```bash
-.venv/bin/python server.py
+node dist/server.js
 ```
 
 The process speaks MCP on stdout. Keep diagnostics off stdout; use stderr if adding logging.
@@ -42,19 +40,19 @@ The process speaks MCP on stdout. Keep diagnostics off stdout; use stderr if add
 Run the protocol test after changes:
 
 ```bash
-.venv/bin/python tests/test_mcp_protocol.py
+npm run test:protocol
 ```
 
 The protocol test must initialize a real stdio client, list tools, call `gazette_status`, search one category, and fetch one known record. A successful import or compile is not enough.
 
 ## Client registration
 
-Use the exact Python interpreter and absolute `server.py` path in the client configuration. See `README.md` for client-specific examples. The portable core is always:
+Use the Node.js executable and absolute `dist/server.js` path in client configuration. The portable core is always:
 
 ```json
 {
-  "command": "/absolute/path/to/python",
-  "args": ["/absolute/path/to/maldives-gazette-mcp/server.py"]
+  "command": "/absolute/path/to/node",
+  "args": ["/absolute/path/to/maldives-gazette-mcp/dist/server.js"]
 }
 ```
 

@@ -4,7 +4,7 @@ A portable, **read-only Model Context Protocol server** for the official Maldive
 
 > https://www.gazette.gov.mv/gazette
 
-It is agent-agnostic: every MCP-compatible client launches the same Python stdio server. No vendor SDK, account, cookie, API key, or hosted service is required.
+It is agent-agnostic: every MCP-compatible client launches the same **TypeScript/Node.js stdio server**. No Python, virtualenv, account, cookie, API key, or hosted service is required.
 
 ## What it exposes
 
@@ -18,66 +18,49 @@ It is agent-agnostic: every MCP-compatible client launches the same Python stdio
 | `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
 | `translate_iulaan_query` | Show Dhivehi variants generated from an English Iulaan search phrase. |
 | `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status; English keywords are expanded into Dhivehi variants. |
-| `get_iulaan` | Read one announcement's employer/issuer, deadline, announcement number, job fields, and attachments. |
+| `get_iulaan` | Read one announcement's employer/issuer, deadline, announcement number, print URL, and attachment links. |
 | `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
 
 The server allowlists Gazette record pages and the official Google Storage PDF path. It never logs in, posts, edits, contacts anyone, or changes the source site.
 
 ## Install
 
-Python 3.11+ is required.
+Node.js 20+ is required.
 
 ```bash
 git clone https://github.com/Rayyan011/maldives-gazette-mcp.git
 cd maldives-gazette-mcp
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
+npm install
+npm run build
 ```
-
-The attachment reader uses `pdftotext` for PDFs. On Debian/Ubuntu install it with:
-
-```bash
-sudo apt-get install poppler-utils
-```
-
-DOCX extraction uses the Python standard library. If `pdftotext` is unavailable, the rest of the MCP still works and the attachment tool returns an explicit error.
 
 The portable MCP command is:
 
 ```bash
-/absolute/path/to/maldives-gazette-mcp/.venv/bin/python \
-  /absolute/path/to/maldives-gazette-mcp/server.py
+node /absolute/path/to/maldives-gazette-mcp/dist/server.js
 ```
-
-Use absolute paths in client configuration. Do not commit a machine-specific home directory into shared config.
 
 
 ## Verify
 
-Run the real protocol test; it initializes an MCP client, discovers all ten tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, verifies English-to-Dhivehi query expansion, reads detail pages, and extracts text from an official attachment:
+Run the real Node MCP protocol test:
 
 ```bash
-.venv/bin/python tests/test_mcp_protocol.py
+npm run test:protocol
 ```
 
-Manual stdio launch is also available:
-
-```bash
-.venv/bin/python server.py
-```
 
 ## Client setup
 
-All examples below use the same two values:
+All examples below use:
 
-- `PYTHON`: `/absolute/path/to/maldives-gazette-mcp/.venv/bin/python`
-- `SERVER`: `/absolute/path/to/maldives-gazette-mcp/server.py`
+- `NODE`: `/absolute/path/to/node`
+- `SERVER`: `/absolute/path/to/maldives-gazette-mcp/dist/server.js`
 
 ### Claude Code
 
 ```bash
-claude mcp add maldives-gazette -- PYTHON SERVER
+claude mcp add maldives-gazette -- NODE SERVER
 ```
 
 Or project `.mcp.json`:
@@ -86,8 +69,8 @@ Or project `.mcp.json`:
 {
   "mcpServers": {
     "maldives-gazette": {
-      "command": "/absolute/path/to/maldives-gazette-mcp/.venv/bin/python",
-      "args": ["/absolute/path/to/maldives-gazette-mcp/server.py"]
+      "command": "/absolute/path/to/node",
+      "args": ["/absolute/path/to/maldives-gazette-mcp/dist/server.js"]
     }
   }
 }
@@ -96,7 +79,7 @@ Or project `.mcp.json`:
 ### Codex CLI
 
 ```bash
-codex mcp add maldives-gazette -- PYTHON SERVER
+codex mcp add maldives-gazette -- NODE SERVER
 ```
 
 Or add the equivalent stdio server to Codex's MCP configuration using the JSON shape shown above.
@@ -109,8 +92,8 @@ Add this to Cursor's MCP settings or `.cursor/mcp.json`:
 {
   "mcpServers": {
     "maldives-gazette": {
-      "command": "/absolute/path/to/maldives-gazette-mcp/.venv/bin/python",
-      "args": ["/absolute/path/to/maldives-gazette-mcp/server.py"]
+      "command": "/absolute/path/to/node",
+      "args": ["/absolute/path/to/maldives-gazette-mcp/dist/server.js"]
     }
   }
 }
@@ -133,7 +116,7 @@ Add the same JSON entry to Windsurf's MCP configuration (`mcp_config.json`).
 Use the MCP settings UI and add a stdio server:
 
 - Name: `maldives-gazette`
-- Command: `PYTHON`
+- Command: `NODE`
 - Arguments: `SERVER`
 
 ### VS Code MCP
@@ -145,7 +128,7 @@ Add the equivalent `mcp` server entry in the workspace or user MCP configuration
 Choose **stdio/local MCP server** and use:
 
 ```text
-command: PYTHON
+command: NODE
 args: SERVER
 ```
 
@@ -155,7 +138,7 @@ The MCP protocol is the compatibility layer; no client-specific code is inside t
 
 ```bash
 printf 'y\n' | hermes mcp add maldives-gazette \
-  --command PYTHON \
+  --command NODE \
   --connect-timeout 30 \
   --args SERVER
 hermes mcp test maldives-gazette

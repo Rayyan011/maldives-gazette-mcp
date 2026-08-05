@@ -54,6 +54,9 @@ IULAAN_TYPES = {
 }
 
 IULAAN_QUERY_TRANSLATIONS = {
+    "admin": "އެޑްމިނިސްޓްރޭޓިވް",
+    "administrative": "އެޑްމިނިސްޓްރޭޓިވް",
+    "administration": "އެޑްމިނިސްޓްރޭޝަން",
     "software developer": "ސޮފްޓްވެއަރ ޑިވެލޮޕަރ",
     "software engineer": "ސޮފްޓްވެއަރ އިންޖިނިއަރ",
     "information technology": "އިންފޮމޭޝަން ޓެކްނޮލޮޖީ",
@@ -389,31 +392,6 @@ def search_iulaan(query: str = "", announcement_type: str = "", job_category: st
         return json.dumps({"error": type(exc).__name__, "message": str(exc), "url": first_url, "query": query, "query_variants": variants}, ensure_ascii=False)
 
 
-def _extract_job_summary(text: str) -> dict[str, Any]:
-    compact = re.sub(r"\s+", " ", text).strip()
-    salary_lines = []
-    for line in text.splitlines():
-        clean_line = re.sub(r"\s+", " ", line).strip()
-        if clean_line and len(clean_line) <= 300 and re.search(r"(?i)(?:MVR|salary|remuneration|މުސާރަ|ރުފިޔާ)", clean_line):
-            salary_lines.append(clean_line[:300])
-    salary = list(dict.fromkeys(salary_lines)) or None
-    year_matches = re.findall(r"(?i)(?:(?:minimum|at least)\s+)?\d+\s*\+?\s*years?[^.\n]{0,100}", compact)
-    years = "; ".join(dict.fromkeys(x.strip()[:160] for x in year_matches)) or None
-    education = None
-    education_match = re.search(r"(?is)(?:qualifications?\s+and\s+experience|education\s+and\s+experience)(.{0,1800})", text)
-    if education_match:
-        education = re.sub(r"\s+", " ", education_match.group(1)).strip(" :-")[:800]
-    description = None
-    description_match = re.search(r"(?is)(?:scope\s+of\s+(?:the\s+)?work|job\s+description|responsibilities)(.{0,2200})", text)
-    if description_match:
-        description = re.sub(r"\s+", " ", description_match.group(1)).strip(" :-")[:1200]
-    if not description:
-        description = compact[:1200] or None
-    months = r"January|February|March|April|May|June|July|August|September|October|November|December|ޖެނުއަރީ|ފެބްރުއަރީ|މާރިޗު|އޭޕްރީލް|މެއި|ޖޫން|ޖުލައި|އޮގަސްޓް|ސެޕްޓެމްބަރު|އޮކްޓޯބަރު|ނޮވެމްބަރު|ޑިސެމްބަރު"
-    deadlines = re.findall(rf"\d{{1,2}}\s+(?:{months})\s+20\d{{2}}(?:\s+[^0-9\n]{{0,12}}\s*\d{{1,2}}:\d{{2}})?", text, re.I)
-    return {"salary": salary, "education_needed": education, "years_of_experience_needed": years, "brief_job_description": description, "deadline_candidates": list(dict.fromkeys(deadlines))}
-
-
 @mcp.tool()
 def get_iulaan(url_or_id: str) -> str:
     """Read one public Iulaan announcement and return its title, issuer, deadline, attachments, and source URL."""
@@ -435,19 +413,10 @@ def get_iulaan(url_or_id: str) -> str:
         number = next((x.split(":", 1)[1].strip() for x in info if x.startswith("ނަންބަރު:")), None)
         published = next((x.split(":", 1)[1].strip() for x in info if x.startswith("ޕަބްލިޝްކުރި ތާރީޚު:")), None)
         deadline_match = re.search(r"ސުންގަޑި:\s*(.+?)(?:$|Tweet|Share)", full_text)
-        attachment_texts = []
-        for attachment in attachments:
-            attachment_url = attachment["url"]
-            if urlparse(attachment_url).hostname == "storage.googleapis.com" and attachment_url.lower().endswith((".pdf", ".docx")):
-                extracted = json.loads(read_iulaan_attachment(attachment_url, max_chars=120000))
-                if extracted.get("text"):
-                    attachment_texts.append({"url": attachment_url, "text": extracted["text"], "characters": extracted.get("characters")})
-        source_text = full_text + "\n" + "\n".join(item["text"] for item in attachment_texts)
-        job_summary = _extract_job_summary(source_text) if (_text(type_link).lower() == "job opportunity" or "ވަޒީފާ" in (_text(type_link) or "")) else {}
+        deadline_info = next((x.split(":", 1)[1].strip() for x in info if x.startswith("ސުންގަޑި:")), None)
         issuer = _text(issuer_link) or None
-        deadline_candidates = job_summary.get("deadline_candidates", [])
-        deadline = deadline_candidates[0] if deadline_candidates else (deadline_match.group(1).strip() if deadline_match else None)
-        values = {"url": url, "print_url": f"{IULAAN}/print/{urlparse(url).path.rsplit('/', 1)[-1]}", "status": status, "title": title or None, "announcement_number": number, "type": _text(type_link) or None, "issuer": issuer, "employer": issuer, "published_date": published, "deadline": deadline, "attachments": attachments, "job_details": {k: v for k, v in job_summary.items() if k != "deadline_candidates"} if job_summary else None, "attachment_text_sources": [{"url": item["url"], "characters": item["characters"]} for item in attachment_texts], "source": url, "fetched_at": datetime.now(timezone.utc).isoformat()}
+        deadline = deadline_info or (deadline_match.group(1).strip() if deadline_match else None)
+        values = {"url": url, "print_url": f"{IULAAN}/print/{urlparse(url).path.rsplit('/', 1)[-1]}", "status": status, "title": title or None, "announcement_number": number, "type": _text(type_link) or None, "issuer": issuer, "employer": issuer, "published_date": published, "deadline": deadline, "attachments": attachments, "source": url, "fetched_at": datetime.now(timezone.utc).isoformat()}
         return json.dumps(values, ensure_ascii=False)
     except Exception as exc:
         return json.dumps({"error": type(exc).__name__, "message": str(exc), "requested": url_or_id}, ensure_ascii=False)

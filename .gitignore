@@ -1,6 +1,18 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
+
+# Node/TypeScript
+node_modules/
+dist/
+.npm/
+
+# Local environment
 .env
 .env.*
+
+# OS/editor
 .DS_Store
+.idea/
+.vscode/

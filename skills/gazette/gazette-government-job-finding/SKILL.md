@@ -19,9 +19,9 @@ Use the `maldives-gazette` MCP to find public Maldives Government job announceme
 
 1. Capture the candidate's role, seniority, skills, qualification, atoll/island preference, nationality or work-authorization constraints, salary needs, and application deadline.
 2. Use `search_iulaan` with `announcement_type="vazeefaa"` for job opportunities. Use `job_category` for fields such as construction, finance, information technology, transport, technical, management, or maintenance.
-3. Add a keyword, `office`, date range, and `open_only=true` for current openings. English keywords are automatically expanded into Dhivehi transliteration variants; use `translate_iulaan_query` to inspect them. Preserve the returned search URL and live-check timestamp.
-4. Use `get_iulaan` on promising records. Confirm the title, employer/issuer, publication date, deadline, announcement number, print view, and all official attachments. Use `read_iulaan_attachment` to extract searchable text from official PDF/DOCX notices when available.
-5. Prefer the official job notice and attached application document over an aggregator or social post. Treat a listing as expired when the stated deadline has passed, even if the page remains searchable.
+3. Convert the user’s English intent into standard Dhivehi Thaana search terms using `references/dhivehi-query-mappings.md`. Preserve the original English phrase, search the Dhivehi phrase and useful individual-term variants, and record which terms were used. The agent/skill owns this translation; the MCP only supplies public search/detail data.
+4. Add `office`, date range, and `open_only=true` for current openings. Preserve the returned search URL and live-check timestamp.
+5. Use `get_iulaan` on promising records, then use `read_iulaan_attachment` for any official TOR/PDF/DOCX. Extract the job-seeker fields from the posting and TOR: employer, salary, education needed, years of experience needed, brief job description, deadline, requirements, and application method. Use `unknown` when the source does not state a field.
 
 ## Evidence fields
 
