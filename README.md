@@ -34,6 +34,14 @@ python3 -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
+The attachment reader uses `pdftotext` for PDFs. On Debian/Ubuntu install it with:
+
+```bash
+sudo apt-get install poppler-utils
+```
+
+DOCX extraction uses the Python standard library. If `pdftotext` is unavailable, the rest of the MCP still works and the attachment tool returns an explicit error.
+
 The portable MCP command is:
 
 ```bash
@@ -42,6 +50,7 @@ The portable MCP command is:
 ```
 
 Use absolute paths in client configuration. Do not commit a machine-specific home directory into shared config.
+
 
 ## Verify
 
