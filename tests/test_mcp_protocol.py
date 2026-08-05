@@ -28,6 +28,9 @@ async def main() -> None:
                 "search_gazette",
                 "get_gazette",
                 "browse_gazette",
+                "iulaan_categories",
+                "search_iulaan",
+                "get_iulaan",
             }
             assert set(names) == expected, names
 
@@ -50,7 +53,28 @@ async def main() -> None:
             assert detail["title"], detail
             assert detail["pdf_url"].endswith(".pdf"), detail
 
-            print(json.dumps({"tools": names, "status": status, "first_result": search["results"][0], "detail": detail}, ensure_ascii=False, indent=2))
+            tender_result = await session.call_tool(
+                "search_iulaan", {"announcement_type": "beelan", "open_only": True, "max_results": 1}
+            )
+            tender = json.loads(tender_result.content[0].text)
+            assert tender["status"] == 200, tender
+            assert tender["results"], tender
+            assert tender["results"][0]["source"].startswith("https://"), tender
+
+            job_result = await session.call_tool(
+                "search_iulaan", {"announcement_type": "vazeefaa", "open_only": True, "max_results": 1}
+            )
+            jobs = json.loads(job_result.content[0].text)
+            assert jobs["status"] == 200, jobs
+            assert jobs["results"], jobs
+
+            iulaan_detail_result = await session.call_tool("get_iulaan", {"url_or_id": "405846"})
+            iulaan_detail = json.loads(iulaan_detail_result.content[0].text)
+            assert iulaan_detail["status"] == 200, iulaan_detail
+            assert iulaan_detail["title"], iulaan_detail
+            assert iulaan_detail["attachments"], iulaan_detail
+
+            print(json.dumps({"tools": names, "status": status, "first_result": search["results"][0], "detail": detail, "tender": tender["results"][0], "job": jobs["results"][0], "iulaan_detail": iulaan_detail}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

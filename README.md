@@ -15,6 +15,9 @@ It is agent-agnostic: every MCP-compatible client launches the same Python stdio
 | `search_gazette` | Search by Unicode/Dhivehi keyword, category, volume, issue, date range, and page. |
 | `get_gazette` | Read one record's title, volume, issue, publication date, and official PDF URL. |
 | `browse_gazette` | Browse a public Gazette path such as `/gazette?page=2`. |
+| `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
+| `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status. |
+| `get_iulaan` | Read one announcement's issuer, deadline, announcement number, and attachments. |
 
 The server allowlists Gazette record pages and the official Google Storage PDF path. It never logs in, posts, edits, contacts anyone, or changes the source site.
 
@@ -41,7 +44,7 @@ Use absolute paths in client configuration. Do not commit a machine-specific hom
 
 ## Verify
 
-Run the real protocol test; it initializes an MCP client, discovers all five tools, checks live status, searches regulations, and reads record `7539`:
+Run the real protocol test; it initializes an MCP client, discovers all eight tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, and reads detail pages:
 
 ```bash
 .venv/bin/python tests/test_mcp_protocol.py
@@ -173,9 +176,10 @@ For legal or policy research, treat the linked official PDF as the authoritative
 
 The repository also includes portable, agent-agnostic skills under [`skills/`](skills/):
 
-- [`job-finding`](skills/research/job-finding/SKILL.md) — find, verify, rank, and track job opportunities without fabricating details or auto-applying.
+- [`gazette-business-project-finding`](skills/gazette/gazette-business-project-finding/SKILL.md) — discover, verify, and compare public tenders, bids, supplies, and project opportunities.
+- [`gazette-government-job-finding`](skills/gazette/gazette-government-job-finding/SKILL.md) — find, verify, and compare government job announcements from Iulaan.
 
-These are plain `SKILL.md` files and can be copied into Hermes, Claude Code, Codex, Cursor, or another agent's skill directory. They do not depend on the Gazette MCP.
+These are plain `SKILL.md` files and can be copied into Hermes, Claude Code, Codex, Cursor, or another agent's skill directory. They use the same MCP but remain separate workflows.
 
 ## Repository guidance
 
