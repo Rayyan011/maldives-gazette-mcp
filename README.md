@@ -169,6 +169,14 @@ Use get_gazette with url_or_id="7539".
 
 For legal or policy research, treat the linked official PDF as the authoritative document. A Gazette title alone does not establish current validity, repeal status, or legal effect.
 
+## Included skills
+
+The repository also includes portable, agent-agnostic skills under [`skills/`](skills/):
+
+- [`job-finding`](skills/research/job-finding/SKILL.md) — find, verify, rank, and track job opportunities without fabricating details or auto-applying.
+
+These are plain `SKILL.md` files and can be copied into Hermes, Claude Code, Codex, Cursor, or another agent's skill directory. They do not depend on the Gazette MCP.
+
 ## Repository guidance
 
 See [`AGENTS.md`](AGENTS.md) for setup, safety boundaries, testing requirements, and contribution rules.

@@ -60,6 +60,28 @@ Use the exact Python interpreter and absolute `server.py` path in the client con
 
 Do not hard-code a user's home directory into shared config files.
 
+## Skills
+
+Portable skills live under `skills/<category>/<name>/SKILL.md`. Keep them agent-agnostic, trigger-focused, evidence-based, and safe for public research. A skill should describe a repeatable workflow, explicit boundaries, common pitfalls, and a verification checklist.
+
+Validate frontmatter before committing:
+
+```bash
+python - <<'PY'
+from pathlib import Path
+import re, yaml
+for path in Path("skills").glob("*/**/SKILL.md"):
+    text = path.read_text()
+    assert text.startswith("---"), path
+    match = re.search(r"\n---\s*\n", text[3:])
+    assert match, path
+    frontmatter = yaml.safe_load(text[3:match.start()+3])
+    assert frontmatter.get("name") and frontmatter.get("description"), path
+    assert len(frontmatter["description"]) <= 1024, path
+print("skill frontmatter ok")
+PY
+```
+
 ## Change discipline
 
 - Keep the MCP read-only.
