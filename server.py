@@ -53,6 +53,38 @@ IULAAN_TYPES = {
     "beelan": "Tender/Bid",
 }
 
+IULAAN_QUERY_TRANSLATIONS = {
+    "software developer": "ސޮފްޓްވެއަރ ޑިވެލޮޕަރ",
+    "software engineer": "ސޮފްޓްވެއަރ އިންޖިނިއަރ",
+    "information technology": "އިންފޮމޭޝަން ޓެކްނޮލޮޖީ",
+    "web developer": "ވެބް ޑިވެލޮޕަރ",
+    "mobile developer": "މޯބައިލް ޑިވެލޮޕަރ",
+    "data analyst": "ޑޭޓާ އެނަލިސްޓް",
+    "cyber security": "ސައިބަރ ސެކިއުރިޓީ",
+    "project manager": "ޕްރޮޖެކްޓް މެނޭޖަރ",
+    "construction": "ކޮންސްޓްރަކްޝަން",
+    "tender": "ބީލަން",
+    "job": "ވަޒީފާ",
+    "jobs": "ވަޒީފާ",
+    "developer": "ޑިވެލޮޕަރ",
+    "development": "ޑިވެލޮޕްމަންޓް",
+    "programmer": "ޕްރޮގްރާމަރ",
+    "programming": "ޕްރޮގްރާމިންގް",
+    "software": "ސޮފްޓްވެއަރ",
+    "technology": "ޓެކްނޮލޮޖީ",
+    "technical": "ޓެކްނިކަލް",
+    "engineer": "އިންޖިނިއަރ",
+    "engineering": "އިންޖިނިއަރިންގް",
+    "system": "ސިސްޓަމް",
+    "systems": "ސިސްޓަމް",
+    "network": "ނެޓްވޯކް",
+    "database": "ޑޭޓާބޭސް",
+    "data": "ޑޭޓާ",
+    "analyst": "އެނަލިސްޓް",
+    "manager": "މެނޭޖަރ",
+    "officer": "އޮފިސަރ",
+}
+
 mcp = FastMCP("maldives-gazette")
 
 
@@ -214,6 +246,24 @@ def _iulaan_query_url(params: dict[str, Any]) -> str:
     return f"{IULAAN}?{urlencode(clean)}" if clean else IULAAN
 
 
+def _iulaan_query_variants(query: str) -> list[str]:
+    normalized = " ".join(query.lower().split())
+    if not normalized or not normalized.isascii():
+        return [query] if query else [""]
+    variants = [query]
+    if normalized in IULAAN_QUERY_TRANSLATIONS:
+        variants.append(IULAAN_QUERY_TRANSLATIONS[normalized])
+    translated_tokens = [IULAAN_QUERY_TRANSLATIONS.get(token, token) for token in normalized.split()]
+    translated = " ".join(translated_tokens)
+    if translated != normalized:
+        variants.append(translated)
+    for token in normalized.split():
+        translated_token = IULAAN_QUERY_TRANSLATIONS.get(token)
+        if translated_token:
+            variants.append(translated_token)
+    return list(dict.fromkeys(variants))
+
+
 def _query_url(params: dict[str, Any]) -> str:
     clean: dict[str, str] = {}
     for key, value in params.items():
@@ -300,27 +350,43 @@ def iulaan_categories() -> str:
 
 
 @mcp.tool()
+def translate_iulaan_query(query: str) -> str:
+    """Show the Dhivehi query variants the Iulaan search will use for an English phrase."""
+    variants = _iulaan_query_variants(query)
+    return json.dumps({"original_query": query, "query_variants": variants, "translated_variants": variants[1:]}, ensure_ascii=False)
+
+
+@mcp.tool()
 def search_iulaan(query: str = "", announcement_type: str = "", job_category: str = "", office: str = "", start_date: str = "", end_date: str = "", open_only: bool = False, page: int = 1, max_results: int = 20) -> str:
-    """Search public Iulaan announcements for tenders, projects, jobs, suppliers, auctions, and notices."""
+    """Search public Iulaan announcements; English queries are automatically expanded into Dhivehi variants."""
     if announcement_type not in IULAAN_TYPES:
         return json.dumps({"error": "invalid announcement_type", "allowed": sorted(IULAAN_TYPES)}, ensure_ascii=False)
     if page < 1 or page > 35152:
         return json.dumps({"error": "page must be between 1 and 35152"}, ensure_ascii=False)
     max_results = max(1, min(max_results, 50))
-    params = {"type": announcement_type, "job-category": job_category, "office": office, "q": query, "start-date": start_date, "end-date": end_date}
-    if open_only:
-        params["open-only"] = 1
-    if page > 1:
-        params["page"] = page
-    url = _iulaan_query_url(params)
+    variants = _iulaan_query_variants(query)
+    merged: dict[str, dict[str, Any]] = {}
+    statuses = []
+    first_url = ""
     try:
-        status, _, body = _fetch(url)
-        parsed = _parse_iulaan_listing(body, url)
-        parsed.update({"status": status, "query": query, "announcement_type": IULAAN_TYPES.get(announcement_type), "requested_page": page, "open_only": open_only, "fetched_at": datetime.now(timezone.utc).isoformat()})
-        parsed["results"] = parsed["results"][:max_results]
-        return json.dumps(parsed, ensure_ascii=False)
+        for variant in variants:
+            params = {"type": announcement_type, "job-category": job_category, "office": office, "q": variant, "start-date": start_date, "end-date": end_date}
+            if open_only:
+                params["open-only"] = 1
+            if page > 1:
+                params["page"] = page
+            url = _iulaan_query_url(params)
+            if not first_url:
+                first_url = url
+            status, _, body = _fetch(url)
+            statuses.append(status)
+            parsed = _parse_iulaan_listing(body, url)
+            for record in parsed["results"]:
+                record["matched_query"] = variant
+                merged.setdefault(record["url"], record)
+        return json.dumps({"url": first_url, "total": len(merged), "results": list(merged.values())[:max_results], "pagination_urls": [], "status": 200 if all(200 <= s < 300 for s in statuses) else max(statuses), "query": query, "query_variants": variants, "announcement_type": IULAAN_TYPES.get(announcement_type), "requested_page": page, "open_only": open_only, "fetched_at": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False)
     except Exception as exc:
-        return json.dumps({"error": type(exc).__name__, "message": str(exc), "url": url}, ensure_ascii=False)
+        return json.dumps({"error": type(exc).__name__, "message": str(exc), "url": first_url, "query": query, "query_variants": variants}, ensure_ascii=False)
 
 
 @mcp.tool()

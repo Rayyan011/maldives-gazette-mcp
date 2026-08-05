@@ -19,7 +19,7 @@ Use the `maldives-gazette` MCP to discover public Maldives Government Iulaan opp
 
 1. Define the business capability, target islands/atolls, contract type, minimum value, delivery capacity, and deadline needs.
 2. Start with `search_iulaan` using `announcement_type="beelan"` for tenders/bids. Also consider `masakkaiy` for work/projects, `gannan-beynunvaa` for requested supplies, `kuyyah-dhinun` for property offered, `neelan` for auctions, and `aanmu-mauloomaathu` for project-related notices.
-3. Add a distinctive keyword, issuer `office`, date range, and `open_only=true` when the user wants active opportunities. Preserve the exact query URL returned by the tool.
+3. Add a distinctive keyword, issuer `office`, date range, and `open_only=true` when the user wants active opportunities. English keywords are automatically expanded into Dhivehi transliteration variants; use `translate_iulaan_query` when you need to inspect the exact variants. Preserve the exact query URL returned by the tool.
 4. Open every serious candidate with `get_iulaan`. Capture the issuer, announcement number, deadline, attachments, and official record URL.
 5. Inspect the linked bid documents before calling an opportunity actionable. Use `read_iulaan_attachment` for official PDF/DOCX text when available, but treat extracted text as a convenience layer; eligibility, scope, submission method, bid security, and contract terms still belong to the official documents.
 

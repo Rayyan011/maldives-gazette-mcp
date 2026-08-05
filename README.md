@@ -16,7 +16,8 @@ It is agent-agnostic: every MCP-compatible client launches the same Python stdio
 | `get_gazette` | Read one record's title, volume, issue, publication date, and official PDF URL. |
 | `browse_gazette` | Browse a public Gazette path such as `/gazette?page=2`. |
 | `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
-| `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status. |
+| `translate_iulaan_query` | Show Dhivehi variants generated from an English Iulaan search phrase. |
+| `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status; English keywords are expanded into Dhivehi variants. |
 | `get_iulaan` | Read one announcement's issuer, deadline, announcement number, and attachments. |
 | `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
 
@@ -54,7 +55,7 @@ Use absolute paths in client configuration. Do not commit a machine-specific hom
 
 ## Verify
 
-Run the real protocol test; it initializes an MCP client, discovers all nine tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, reads detail pages, and extracts text from an official attachment:
+Run the real protocol test; it initializes an MCP client, discovers all ten tools, checks live status, searches a Gazette category, searches an open tender, searches an open government job, verifies English-to-Dhivehi query expansion, reads detail pages, and extracts text from an official attachment:
 
 ```bash
 .venv/bin/python tests/test_mcp_protocol.py

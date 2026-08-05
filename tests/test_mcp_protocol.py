@@ -29,6 +29,7 @@ async def main() -> None:
                 "get_gazette",
                 "browse_gazette",
                 "iulaan_categories",
+                "translate_iulaan_query",
                 "search_iulaan",
                 "get_iulaan",
                 "read_iulaan_attachment",
@@ -82,6 +83,20 @@ async def main() -> None:
             attachment = json.loads(attachment_result.content[0].text)
             assert attachment["characters"] > 0, attachment
             assert attachment["source"].endswith(".pdf"), attachment
+
+            translation_result = await session.call_tool(
+                "translate_iulaan_query", {"query": "software developer"}
+            )
+            translation = json.loads(translation_result.content[0].text)
+            assert translation["translated_variants"], translation
+            assert any("ސޮފްޓްވެއަރ" in variant for variant in translation["translated_variants"]), translation
+
+            translated_search_result = await session.call_tool(
+                "search_iulaan", {"query": "software developer", "announcement_type": "vazeefaa", "open_only": True, "max_results": 5}
+            )
+            translated_search = json.loads(translated_search_result.content[0].text)
+            assert translated_search["query_variants"], translated_search
+            assert translated_search["results"], translated_search
 
             print(json.dumps({"tools": names, "status": status, "first_result": search["results"][0], "detail": detail, "tender": tender["results"][0], "job": jobs["results"][0], "iulaan_detail": iulaan_detail, "attachment": {"source": attachment["source"], "characters": attachment["characters"], "truncated": attachment["truncated"]}}, ensure_ascii=False, indent=2))
 
