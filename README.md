@@ -21,7 +21,7 @@ It is agent-agnostic: every MCP-compatible client launches the same **TypeScript
 | `get_iulaan` | Read one announcement's employer/issuer, deadline, announcement number, print URL, and attachment links. |
 | `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
 
-The server allowlists Gazette record pages and the official Google Storage PDF path. It never logs in, posts, edits, contacts anyone, or changes the source site.
+The server allowlists Gazette record pages, official Gazette Storage attachments, and official CSC `/download/` attachments. It never logs in, posts, edits, contacts anyone, or changes the source site.
 
 ## Install
 
@@ -172,6 +172,12 @@ The repository also includes portable, agent-agnostic skills under [`skills/`](s
 
 - [`gazette-business-project-finding`](skills/gazette/gazette-business-project-finding/SKILL.md) — discover, verify, and compare public tenders, bids, supplies, and project opportunities.
 - [`gazette-government-job-finding`](skills/gazette/gazette-government-job-finding/SKILL.md) — find, verify, and compare government job announcements from Iulaan.
+- [`gazette-compensation-calculator`](skills/gazette/gazette-compensation-calculator/SKILL.md) — calculate transparent monthly salary estimates from fixed and attendance-based allowances.
+- [`gazette-dhivehi-query-builder`](skills/gazette/gazette-dhivehi-query-builder/SKILL.md) — turn English research requests into standard Dhivehi Thaana search variants.
+- [`gazette-job-shortlist-ranking`](skills/gazette/gazette-job-shortlist-ranking/SKILL.md) — rank job postings against a candidate's qualifications and preferences.
+- [`gazette-deadline-monitor`](skills/gazette/gazette-deadline-monitor/SKILL.md) — re-check saved Iulaan postings and classify deadline risk.
+- [`gazette-tor-evidence-extraction`](skills/gazette/gazette-tor-evidence-extraction/SKILL.md) — download and read official TORs and application documents, including English TORs.
+- [`gazette-mcp-client-setup`](skills/gazette/gazette-mcp-client-setup/SKILL.md) — install and configure the TypeScript MCP in compatible clients.
 
 These are plain `SKILL.md` files and can be copied into Hermes, Claude Code, Codex, Cursor, or another agent's skill directory. They use the same MCP but remain separate workflows.
 

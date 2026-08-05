@@ -59,7 +59,11 @@ function safeSite(url: string) {
   const u = new URL(url); if (u.protocol !== "https:" || !["www.gazette.gov.mv", "gazette.gov.mv"].includes(u.hostname) || !(u.pathname.startsWith("/gazette") || u.pathname.startsWith("/iulaan"))) throw new Error("URL is outside the public Gazette allowlist"); return u.toString();
 }
 function safeAttachment(url: string) {
-  const u = new URL(url); if (u.protocol !== "https:" || u.hostname !== "storage.googleapis.com" || !u.pathname.startsWith("/gazette.gov.mv/docs/iulaan/")) throw new Error("attachment is outside the official Iulaan attachment allowlist"); return u.toString();
+  const u = new URL(url);
+  const officialStorage = u.hostname === "storage.googleapis.com" && u.pathname.startsWith("/gazette.gov.mv/docs/iulaan/");
+  const officialCsc = ["www.csc.gov.mv", "csc.gov.mv"].includes(u.hostname) && u.pathname.startsWith("/download/");
+  if (u.protocol !== "https:" || (!officialStorage && !officialCsc)) throw new Error("attachment is outside the official Gazette/CSC attachment allowlist");
+  return u.toString();
 }
 function iulaanUrl(params: Record<string, string | number | boolean>) { const u = new URL(IULAAN); for (const [k,v] of Object.entries(params)) if (v !== "" && v !== false) u.searchParams.set(k, String(v)); return u.toString(); }
 

@@ -115,12 +115,10 @@ def _safe_url(url: str, *, allow_pdf: bool = False) -> str:
 
 def _safe_attachment_url(url: str) -> str:
     parsed = urlparse(url)
-    if parsed.scheme != "https" or parsed.hostname != "storage.googleapis.com":
-        raise ValueError("attachment must use the official storage host")
-    if not parsed.path.startswith("/gazette.gov.mv/docs/iulaan/"):
-        raise ValueError("attachment is outside the official Iulaan attachment path")
-    if not parsed.path.lower().endswith((".pdf", ".docx", ".doc", ".xlsx", ".xls")):
-        raise ValueError("unsupported attachment type")
+    storage_ok = parsed.scheme == "https" and parsed.hostname == "storage.googleapis.com" and parsed.path.startswith("/gazette.gov.mv/docs/iulaan/")
+    csc_ok = parsed.scheme == "https" and parsed.hostname in {"www.csc.gov.mv", "csc.gov.mv"} and parsed.path.startswith("/download/")
+    if not (storage_ok or csc_ok):
+        raise ValueError("attachment must use an official Gazette storage or CSC download host")
     return url
 
 
