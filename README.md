@@ -11,15 +11,25 @@ It is agent-agnostic: every MCP-compatible client launches the same **TypeScript
 | Tool | Purpose |
 |---|---|
 | `gazette_status` | Check live reachability and HTTP status. |
-| `gazette_categories` | List Law, Regulation, Decision, Procedure/Policy, Other, and Tax ruling categories. |
-| `search_gazette` | Search by Unicode/Dhivehi keyword, category, volume, issue, date range, and page. |
-| `get_gazette` | Read one record's title, volume, issue, publication date, and official PDF URL. |
-| `browse_gazette` | Browse a public Gazette path such as `/gazette?page=2`. |
-| `iulaan_categories` | List Iulaan categories, including tenders and job opportunities. |
-| `translate_iulaan_query` | Show Dhivehi variants generated from an English Iulaan search phrase. |
-| `search_iulaan` | Search public announcements by type, keyword, office, job category, date, and open status; English keywords are expanded into Dhivehi variants. |
-| `get_iulaan` | Read one announcement's employer/issuer, deadline, announcement number, print URL, and attachment links. |
-| `read_iulaan_attachment` | Extract text from an official Iulaan PDF or DOCX attachment. |
+| `gazette_categories` | List decoded Gazette categories and URL values. |
+| `gazette_filter_schema` | Read the live Gazette form and its fields. |
+| `search_gazette` / `search_gazette_advanced` | Search by category, volume, issue, query, date range, and page. |
+| `get_gazette` | Read a record, visible text, links, and official PDF. |
+| `get_gazette_print` | Read a cleaner Gazette detail/print view. |
+| `read_gazette_pdf` | Extract text from an official Gazette PDF. |
+| `search_gazette_pdf` | Search terms inside an official Gazette PDF. |
+| `browse_gazette` | Browse a public Gazette path or page. |
+| `iulaan_categories` | List decoded announcement and job-category values. |
+| `iulaan_filter_schema` | Read the live Iulaan form and its fields. |
+| `translate_iulaan_query` | Show standard Dhivehi Thaana query variants. |
+| `list_iulaan_offices` | Discover public office/issuer filter links. |
+| `search_iulaan` / `search_iulaan_advanced` | Search by announcement type, job category, office, query, dates, open status, and page. |
+| `browse_iulaan_pages` | Browse a filtered Iulaan page with pagination. |
+| `get_iulaan` | Read full posting text, employer, print URL, and attachments. |
+| `get_iulaan_print` | Read the official Iulaan print view. |
+| `list_iulaan_attachments` | List official TOR/application documents. |
+| `read_iulaan_attachment` | Extract text from official PDF/DOCX attachments. |
+| `search_iulaan_attachment_text` | Search terms inside an official attachment. |
 
 The server allowlists Gazette record pages, official Gazette Storage attachments, and official CSC `/download/` attachments. It never logs in, posts, edits, contacts anyone, or changes the source site.
 
@@ -178,6 +188,8 @@ The repository also includes portable, agent-agnostic skills under [`skills/`](s
 - [`gazette-deadline-monitor`](skills/gazette/gazette-deadline-monitor/SKILL.md) — re-check saved Iulaan postings and classify deadline risk.
 - [`gazette-tor-evidence-extraction`](skills/gazette/gazette-tor-evidence-extraction/SKILL.md) — download and read official TORs and application documents, including English TORs.
 - [`gazette-mcp-client-setup`](skills/gazette/gazette-mcp-client-setup/SKILL.md) — install and configure the TypeScript MCP in compatible clients.
+- [`gazette-pdf-research`](skills/gazette/gazette-pdf-research/SKILL.md) — search and cite evidence inside official Gazette and Iulaan PDFs.
+- [`gazette-filtered-search`](skills/gazette/gazette-filtered-search/SKILL.md) — use the website's live category, office, date, job, and open-status filters.
 
 These are plain `SKILL.md` files and can be copied into Hermes, Claude Code, Codex, Cursor, or another agent's skill directory. They use the same MCP but remain separate workflows.
 
