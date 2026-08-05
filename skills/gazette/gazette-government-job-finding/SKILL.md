@@ -30,7 +30,10 @@ For each role, report:
 - Original title and a clearly labeled English explanation if needed
 - Issuing office/employer
 - Announcement number
-- Publication date and deadline as posted
+- Publication date and application deadline as posted
+- Salary or salary range, including pay basis/currency when stated
+- Job description and main responsibilities
+- Required years of experience, preserving the original wording
 - Role category and location when stated
 - Direct Iulaan URL
 - Official attachment URLs
