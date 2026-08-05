@@ -11,11 +11,17 @@ It is agent-agnostic: every MCP-compatible client launches the same **TypeScript
 | Tool | Purpose |
 |---|---|
 | `gazette_status` | Check live reachability and HTTP status. |
+| `latest_homepage_feed` | Read the newest Gazette and Iulaan cards shown on the official homepage. |
+| `crawl_gazette_archive` / `crawl_iulaan_archive` | Crawl bounded archive pages with filters, deduplication, page counts, and stop reasons. |
+| `research_domains` | List broad official research coverage. |
+| `search_general_research` | Search Gazette and Iulaan together for broad public research. |
+| `search_laws_regulations` | Search legal and policy Gazette categories together. |
+| `search_public_notices` | Search general Iulaan notices and public-information records. |
 | `gazette_categories` | List decoded Gazette categories and URL values. |
 | `gazette_filter_schema` | Read the live Gazette form and its fields. |
 | `search_gazette` / `search_gazette_advanced` | Search by category, volume, issue, query, date range, and page. |
-| `get_gazette` | Read a record, visible text, links, and official PDF. |
-| `get_gazette_print` | Read a cleaner Gazette detail/print view. |
+| `get_gazette` | Read a record with structured ID, title, publication date, volume, issue, PDF, links, and visible text. |
+| `get_gazette_print` | Read the Gazette detail page; the public site has no separate Gazette print route. |
 | `read_gazette_pdf` | Extract text from an official Gazette PDF. |
 | `search_gazette_pdf` | Search terms inside an official Gazette PDF. |
 | `browse_gazette` | Browse a public Gazette path or page. |
@@ -155,6 +161,18 @@ hermes mcp test maldives-gazette
 ```
 
 ## Usage examples
+
+Read the homepage's newest official records:
+
+```text
+Use latest_homepage_feed with source="all" and max_results=10.
+```
+
+Crawl a bounded archive safely:
+
+```text
+Use crawl_iulaan_archive with announcement_type="masakkaiy", from_page=1, max_pages=10, max_results=200.
+```
 
 Search the latest regulations:
 
